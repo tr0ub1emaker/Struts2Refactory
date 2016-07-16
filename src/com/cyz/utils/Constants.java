@@ -2,7 +2,7 @@ package com.cyz.utils;
 
 public class Constants {
 
-	/** 暂时的所有的sql语句*/
+	/** */
 	public static String SQL_EXECUTE_PROPERTIES="sql_execute_properties";
 	
 	public static String DRIVERNAME = "DRIVERNAME";
