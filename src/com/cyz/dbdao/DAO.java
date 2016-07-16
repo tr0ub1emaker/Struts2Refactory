@@ -13,23 +13,64 @@ import com.cyz.bean.BeanBase;
 public class DAO {
 
 	private Connection connection;
-	private String sql;
 	
-	@SuppressWarnings("unused")
-	private void initialize(String sqlContent){
+	public DAO() {
+		this.initialize();
+	}
+
+	private void initialize(){
 		System.out.println("start geting DB connection.");
 		this.connection = DBConnection.getConnection();
-		this.sql = sqlContent;
 		System.out.println("get DB connection success. ");
 	}
 	
-	public <T> LinkedList<BeanBase> executeSelect(Class<T> elementClass) {
+	public String selectOneByOne(String sql){
+		
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		int resultCount = 0;
+		String returnString = "";
+		
+		try {
+			ps = connection.prepareStatement(sql);
+			rs = ps.executeQuery();
+			
+			System.out.println(sql);
+			
+			while (rs.next()) {
+				ResultSetMetaData resultData = rs.getMetaData();
+				resultCount = resultData.getColumnCount();
+				
+				if (resultCount == 1) {
+					returnString = rs.getString(1);
+				}else if (resultCount > 1) {
+					
+					System.out.println("the column has one more results, need investigation!!");
+					returnString = rs.getString(1);
+				}else {
+					return "";
+				}
+				
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returnString;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public <T> LinkedList executeSelect(Class<T> elementClass, String sql) {
 		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		List<BeanBase> lin = new LinkedList<BeanBase>();
 		try {
+			
+			System.out.println("execute: " + sql);
+			
 			ps = connection.prepareStatement(sql);
 			rs = ps.executeQuery();
 			
@@ -37,7 +78,15 @@ public class DAO {
 				BeanBase element = (BeanBase) elementClass.newInstance();
 				ResultSetMetaData rsmd = rs.getMetaData();
 				
-				for (int i = 0; i < rsmd.getColumnCount(); i++) {
+				int count = rsmd.getColumnCount();
+				
+				System.out.println("result count: " + count);
+				
+				if (count == 0) {
+					System.out.println("no result found!");
+				}
+				
+				for (int i = 1; i < count; i++) {
 					element.setValue(rsmd.getColumnName(i), rs.getString(i).trim());
 				}
 				lin.add(element);
