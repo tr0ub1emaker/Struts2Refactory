@@ -1,31 +1,19 @@
 package com.cyz.dbdao.impl;
 
-import java.sql.Connection;
-import java.util.LinkedList;
-import java.util.List;
-
-import com.cyz.bean.BeanBase;
-import com.cyz.bean.Uuser;
 import com.cyz.dbdao.DAO;
 import com.cyz.dbdao.DBConnection;
 
-public class UuserDaoImpl {
+public class UserDaoImpl {
 
-	/**
-	 * get the password by username
-	 * **/
-	@SuppressWarnings("unchecked")
-	public String getPassword(String uname){
+	public boolean MatchPassword(String uname, String password){
+		
+		String pw = null;
 		
 		DBConnection.initialize();
 		DAO dao = new DAO();
-		return dao.selectOneByOne("SELECT U_PW FROM Cyz.UUSER WHERE U_NAME='"+ uname + "'");
+		pw = dao.selectOneByOne("SELECT U_PW FROM Cyz.UUSER WHERE U_NAME='"+ uname + "'");
 		
+		return pw.equals(password);
 	}
-	
-	public static void main(String[] args) {
-		UuserDaoImpl udi = new UuserDaoImpl();
-		String pass = udi.getPassword("frank");
-		System.out.println(pass);
-	}
+
 }

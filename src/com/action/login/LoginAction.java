@@ -1,5 +1,7 @@
 package com.action.login;
 
+import com.cyz.dbdao.impl.UserDaoImpl;
+import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 
 public class LoginAction extends ActionSupport{
@@ -21,8 +23,23 @@ public class LoginAction extends ActionSupport{
 	
 	@Override
 	public String execute() throws Exception {
-		System.out.println("Username: " + username);
-		System.out.println("Password: " + password);
-		return super.execute();
+		
+		//创建上下文（context）对象 用来将用户名储存到session中
+		ActionContext context= ActionContext.getContext();
+		
+		System.out.println(username + "/" + password);
+		UserDaoImpl userService = new UserDaoImpl();
+		Boolean returnType = userService.MatchPassword(username, password);
+
+		if (returnType) {
+			//向Request中添加：
+			//context.put("username", username);
+			//向session中添加:
+			context.getSession().put("username", username);
+			
+			return "loginsucc";
+		}else{
+			return "wrongpw";
+		}
 	}
 }
